@@ -1,5 +1,9 @@
 package com.joaopedro.taskmanager.controller;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import com.joaopedro.taskmanager.entity.TaskStatus;
+import com.joaopedro.taskmanager.entity.TaskPriority;
+
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -35,8 +39,10 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> findAll() {
-        return taskService.findAll();
+    public List<Task> findAll(
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) TaskPriority priority) {
+        return taskService.findAll(status, priority);
     }
 
     @GetMapping("/{id}")

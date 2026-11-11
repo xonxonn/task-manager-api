@@ -3,6 +3,7 @@ package com.joaopedro.taskmanager.exception;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,6 +38,16 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .reduce((a, b) -> a + "; " + b)
                 .orElse("Dados inválidos");
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
+    }
+    
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = "Valor inválido para o parâmetro '" + ex.getName() + "'.";
+        Class<?> type = ex.getRequiredType();
+        if (type != null && type.isEnum()) {
+            message += " Valores aceitos: " + Arrays.toString(type.getEnumConstants());
+        }
         return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
